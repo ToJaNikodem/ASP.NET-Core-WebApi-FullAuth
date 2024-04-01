@@ -1,0 +1,10 @@
+{
+    "EmailSettings": {
+        "SmtpServer": "host795037.hostido.net.pl",
+        "Port": 587,
+        "UseSSL": true,
+        "SenderEmail": "feedbackmail@host795037.xce.pl",
+        "SenderName": "NET Core FullAuth",
+        "Password": "kcg5QBC9yTAPvGPxh9Gt7doBdktJy8HQYs43ssjGTag5Xy5kVWuwaDTMqSNPqF7t"
+    }
+}
