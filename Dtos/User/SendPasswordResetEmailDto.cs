@@ -9,6 +9,7 @@ namespace FullAuth.Dtos.User
     public class SendPasswordResetEmailDto
     {
         [Required]
-        public string? Email { get; set; }
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
     }
 }

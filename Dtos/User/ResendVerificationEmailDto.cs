@@ -9,6 +9,6 @@ namespace FullAuth.Dtos.User
     public class ResendVerificationEmailDto
     {
         [Required]
-        public string? UserName { get; set; }
+        public string UserName { get; set; } = string.Empty;
     }
 }

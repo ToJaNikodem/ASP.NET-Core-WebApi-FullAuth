@@ -9,11 +9,11 @@ namespace FullAuth.Dtos.User
     public class PasswordChangeDto
     {
         [Required]
-        public string? UserName { get; set; }
-
+        public string UserName { get; set; } = string.Empty;
         [Required]
-        public string? OldPassword { get; set; }
+        public string OldPassword { get; set; } = string.Empty;
         [Required]
-        public string? NewPassword { get; set; }
+        [StringLength(64, ErrorMessage = "Password cannot exceed 64 characters!")]
+        public string NewPassword { get; set; } = string.Empty;
     }
 }

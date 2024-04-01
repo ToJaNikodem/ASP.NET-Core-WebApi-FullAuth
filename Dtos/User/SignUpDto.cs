@@ -9,11 +9,15 @@ namespace FullAuth.Dtos.User
     public class SignUpDto
     {
         [Required]
-        public string? UserName { get; set; }
+        [RegularExpression(@"^[a-z0-9](?:[a-z0-9]+[.\-_]?)+[a-z0-9]$", ErrorMessage = "Invalid username format!")]
+        [StringLength(40, MinimumLength = 4, ErrorMessage = "Username must be between 4 and 40 characters long.")]
+        public string UserName { get; set; } = string.Empty;
         [Required]
         [EmailAddress]
-        public string? Email { get; set; }
+        [StringLength(256, ErrorMessage = "Email cannot exceed 256 characters!")]
+        public string Email { get; set; } = string.Empty;
         [Required]
-        public string? Password { get; set; }
+        [StringLength(64, ErrorMessage = "Password cannot exceed 64 characters!")]
+        public string Password { get; set; } = string.Empty;
     }
 }

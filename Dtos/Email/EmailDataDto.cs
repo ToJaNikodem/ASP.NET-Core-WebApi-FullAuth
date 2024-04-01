@@ -7,9 +7,9 @@ namespace FullAuth.Dtos.Email
 {
     public class EmailDataDto
     {
-        public string EmailTo { get; set; }
-        public string Subject { get; set; }
-        public string TemplateName { get; set; }
-        public Dictionary<string, string> TemplateData { get; set; }
+        public string EmailTo { get; set; } = string.Empty;
+        public string Subject { get; set; } = string.Empty;
+        public string TemplateName { get; set; } = string.Empty;
+        public Dictionary<string, string> TemplateData { get; set; } = [];
     }
 }

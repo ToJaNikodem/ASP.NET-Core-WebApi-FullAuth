@@ -59,6 +59,11 @@ namespace FullAuth.Controllers
 
                 var user = await _userManager.FindByNameAsync(signUpDto.UserName);
 
+                if (user == null)
+                {
+                    return BadRequest("Invalid credentials!");
+                }
+
                 await SendVerification(user);
 
                 return Ok(new NewUserDto
@@ -418,12 +423,12 @@ namespace FullAuth.Controllers
 
             var emailData = new EmailDataDto
             {
-                EmailTo = user.Email,
+                EmailTo = user.Email!,
                 Subject = "Verify your email!",
                 TemplateName = "email-verification-email.html",
                 TemplateData = new Dictionary<string, string>
                 {
-                    {"{{ username }}", user.UserName },
+                    {"{{ username }}", user.UserName! },
                     {"{{ url }}", url },
                 }
             };
@@ -439,12 +444,12 @@ namespace FullAuth.Controllers
 
             var emailData = new EmailDataDto
             {
-                EmailTo = user.Email,
+                EmailTo = user.Email!,
                 Subject = "Reset your password!",
                 TemplateName = "password-reset-email.html",
                 TemplateData = new Dictionary<string, string>
                 {
-                    {"{{ username }}", user.UserName },
+                    {"{{ username }}", user.UserName! },
                     {"{{ url }}", url },
                 }
             };

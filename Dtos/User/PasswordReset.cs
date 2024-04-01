@@ -9,10 +9,11 @@ namespace FullAuth.Dtos.User
     public class PasswordResetDto
     {
         [Required]
-        public string? EncodedUserId { get; set; }
+        public string EncodedUserId { get; set; } = string.Empty;
         [Required]
-        public string? ResetToken { get; set; }
+        public string ResetToken { get; set; } = string.Empty;
         [Required]
-        public string? NewPassword { get; set; }
+        [StringLength(64, ErrorMessage = "Password cannot exceed 64 characters!")]
+        public string NewPassword { get; set; } = string.Empty;
     }
 }

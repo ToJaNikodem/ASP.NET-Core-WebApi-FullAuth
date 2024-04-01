@@ -14,8 +14,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("local-appsettings.json", optional: true, reloadOnChange: true);
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -48,9 +46,16 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-builder.Services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDBContext>()
-                .AddDefaultTokenProviders();
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 10;
+})
+.AddEntityFrameworkStores<ApplicationDBContext>()
+.AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -71,7 +76,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidateLifetime = true,
         IssuerSigningKey = new SymmetricSecurityKey(
-            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"])
+            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]!)
         )
     };
 });
@@ -93,7 +98,6 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
