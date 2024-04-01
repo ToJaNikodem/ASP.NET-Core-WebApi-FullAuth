@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using FullAuth.Dtos.Email;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
+using System.Web;
 
 namespace FullAuth.Controllers
 {
@@ -309,7 +310,7 @@ namespace FullAuth.Controllers
                 }
 
                 var result = await _userManager.ConfirmEmailAsync(user, emailVerificationDto.VerificationToken);
-
+    
                 if (!result.Succeeded)
                 {
                     return BadRequest("Invalid token!");
@@ -418,8 +419,9 @@ namespace FullAuth.Controllers
         private async Task SendVerification(User user)
         {
             var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var encodedVerificationToken = HttpUtility.UrlEncode(verificationToken.ToString());
             var encodedUserId = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(user.Id.ToString()));
-            var url = "http://localhost:8080/verify/" + encodedUserId + "/" + verificationToken.ToString();
+            var url = "http://localhost:8080/verify/" + encodedUserId + "/" + encodedVerificationToken;
 
             var emailData = new EmailDataDto
             {
@@ -439,8 +441,9 @@ namespace FullAuth.Controllers
         private async Task SendPasswordReset(User user)
         {
             var verificationToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var encodedVerificationToken = HttpUtility.UrlEncode(verificationToken.ToString());
             var encodedUserId = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(user.Id.ToString()));
-            var url = "http://localhost:8080/password-reset/" + encodedUserId + "/" + verificationToken.ToString();
+            var url = "http://localhost:8080/password-reset/" + encodedUserId + "/" + encodedVerificationToken;
 
             var emailData = new EmailDataDto
             {
