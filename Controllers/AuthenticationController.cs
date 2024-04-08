@@ -12,6 +12,7 @@ using FullAuth.Dtos.Email;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
 using System.Web;
+using Newtonsoft.Json;
 
 namespace FullAuth.Controllers
 {
@@ -29,6 +30,21 @@ namespace FullAuth.Controllers
             _emailService = emailService;
         }
 
+        // public class ErrorList
+        // {
+        //     public required List<UserNameErrorDetail> Errors { get; set; }
+        // }
+
+        // public class UserNameErrorDetail
+        // {
+        //     public required List<ErrorDetail> UserNameErrors { get; set; }
+        // }
+
+        // public class ErrorDetail
+        // {
+        //     public string? Message { get; set; }
+        // }
+
         [HttpPost("signup")]
         public async Task<IActionResult> Signup([FromBody] SignUpDto signUpDto)
         {
@@ -37,6 +53,23 @@ namespace FullAuth.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
+                }
+
+                if (await _userManager.FindByNameAsync(signUpDto.UserName) != null)
+                {
+                    var errorList = new
+                    {
+                        errors = new
+                        {
+                            UserName = new string[] { "Username already taken!" }
+                        }
+                    };
+                    return BadRequest(errorList);
+                }
+
+                if (await _userManager.FindByEmailAsync(signUpDto.Email) != null)
+                {
+                    return BadRequest("Email already taken!");
                 }
 
                 var appUser = new User
@@ -62,7 +95,7 @@ namespace FullAuth.Controllers
 
                 if (user == null)
                 {
-                    return BadRequest("Invalid credentials!");
+                    return StatusCode(500);
                 }
 
                 await SendVerification(user);
@@ -94,12 +127,12 @@ namespace FullAuth.Controllers
 
                 if (user == null)
                 {
-                    return BadRequest("Invalid credentials!");
+                    return BadRequest();
                 }
 
                 if (!await _userManager.CheckPasswordAsync(user, logInDto.Password))
                 {
-                    return BadRequest("Invalid credentials!");
+                    return BadRequest();
                 }
                 (string accessToken, string refreshToken) = _tokenService.CreateTokens(user);
 
@@ -310,7 +343,7 @@ namespace FullAuth.Controllers
                 }
 
                 var result = await _userManager.ConfirmEmailAsync(user, emailVerificationDto.VerificationToken);
-    
+
                 if (!result.Succeeded)
                 {
                     return BadRequest("Invalid token!");
@@ -342,7 +375,8 @@ namespace FullAuth.Controllers
                     return BadRequest("User doesn't exist!");
                 }
 
-                if (user.EmailConfirmed) {
+                if (user.EmailConfirmed)
+                {
                     return BadRequest("Email already confirmed!");
                 }
 
@@ -357,7 +391,8 @@ namespace FullAuth.Controllers
         }
 
         [HttpPost("send-password-reset-email")]
-        public async Task<IActionResult> SendPasswordResetEmail([FromBody] SendPasswordResetEmailDto sendPasswordResetEmailDto) {
+        public async Task<IActionResult> SendPasswordResetEmail([FromBody] SendPasswordResetEmailDto sendPasswordResetEmailDto)
+        {
             try
             {
                 if (!ModelState.IsValid)
@@ -380,7 +415,7 @@ namespace FullAuth.Controllers
             {
                 return StatusCode(500, e);
             }
-            
+
         }
 
         [HttpPost("password-reset")]
@@ -404,7 +439,8 @@ namespace FullAuth.Controllers
 
                 var result = await _userManager.ResetPasswordAsync(user, passwordResetDto.ResetToken, passwordResetDto.NewPassword);
 
-                if(!result.Succeeded) {
+                if (!result.Succeeded)
+                {
                     return BadRequest("Invalid link!");
                 }
 
