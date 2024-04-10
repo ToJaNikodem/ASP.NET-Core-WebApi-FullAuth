@@ -19,6 +19,7 @@
           "Microsoft.EntityFrameworkCore.Tools": "8.0.2",
           "Microsoft.Extensions.Identity.Core": "8.0.2",
           "Microsoft.Extensions.Logging": "8.0.0",
+          "Newtonsoft.Json": "13.0.3",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.2",
           "Swashbuckle.AspNetCore": "6.4.0"
         },

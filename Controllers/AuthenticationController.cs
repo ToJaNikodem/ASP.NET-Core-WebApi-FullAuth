@@ -12,12 +12,14 @@ using FullAuth.Dtos.Email;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
 using System.Web;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace FullAuth.Controllers
 {
-    [Route("api/user")]
     [ApiController]
+    [Route("api/user")]
     public class AuthenticationController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
@@ -30,38 +32,18 @@ namespace FullAuth.Controllers
             _emailService = emailService;
         }
 
-        // public class ErrorList
-        // {
-        //     public required List<UserNameErrorDetail> Errors { get; set; }
-        // }
-
-        // public class UserNameErrorDetail
-        // {
-        //     public required List<ErrorDetail> UserNameErrors { get; set; }
-        // }
-
-        // public class ErrorDetail
-        // {
-        //     public string? Message { get; set; }
-        // }
-
         [HttpPost("signup")]
         public async Task<IActionResult> Signup([FromBody] SignUpDto signUpDto)
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 if (await _userManager.FindByNameAsync(signUpDto.UserName) != null)
                 {
                     var errorList = new
                     {
                         errors = new
                         {
-                            UserName = new string[] { "Username already taken!" }
+                            userName = new string[] { "Username already taken!" }
                         }
                     };
                     return BadRequest(errorList);
@@ -69,7 +51,14 @@ namespace FullAuth.Controllers
 
                 if (await _userManager.FindByEmailAsync(signUpDto.Email) != null)
                 {
-                    return BadRequest("Email already taken!");
+                    var errorList = new
+                    {
+                        errors = new
+                        {
+                            email = new string[] { "Email already taken!" }
+                        }
+                    };
+                    return BadRequest(errorList);
                 }
 
                 var appUser = new User
@@ -118,11 +107,6 @@ namespace FullAuth.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 var user = await _userManager.FindByNameAsync(logInDto.UserNameOrEmail) ?? await _userManager.FindByEmailAsync(logInDto.UserNameOrEmail);
 
                 if (user == null)
@@ -159,11 +143,6 @@ namespace FullAuth.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 var user = await _userManager.FindByNameAsync(refreshTokenDto.UserName);
                 if (user == null)
                 {
@@ -205,11 +184,6 @@ namespace FullAuth.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 var user = await _userManager.FindByNameAsync(logOutDto.UserName);
 
                 if (user == null)
@@ -235,11 +209,6 @@ namespace FullAuth.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 var user = await _userManager.FindByNameAsync(deleteUserDto.UserName);
 
                 if (user == null)
@@ -267,9 +236,16 @@ namespace FullAuth.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
+                if (await _userManager.FindByNameAsync(usernameChangeDto.NewUserName) != null)
                 {
-                    return BadRequest(ModelState);
+                    var errorList = new
+                    {
+                        errors = new
+                        {
+                            newUserName = new string[] { "Username already taken!" }
+                        }
+                    };
+                    return BadRequest(errorList);
                 }
 
                 var user = await _userManager.FindByNameAsync(usernameChangeDto.OldUserName);
@@ -296,11 +272,6 @@ namespace FullAuth.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 var user = await _userManager.FindByNameAsync(passwordChangeDto.UserName);
 
                 if (user == null)
@@ -313,7 +284,10 @@ namespace FullAuth.Controllers
                     return BadRequest("Invalid password!");
                 }
 
-                await _userManager.ChangePasswordAsync(user, passwordChangeDto.OldPassword, passwordChangeDto.NewPassword);
+                var result = await _userManager.ChangePasswordAsync(user, passwordChangeDto.OldPassword, passwordChangeDto.NewPassword);
+                if (!result.Succeeded) {
+                    return BadRequest(result.Errors);
+                }
 
                 return Ok("Password changed successfully!");
             }
@@ -328,11 +302,6 @@ namespace FullAuth.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 byte[] decodedUserId = WebEncoders.Base64UrlDecode(emailVerificationDto.EncodedUserId);
                 string userId = Encoding.UTF8.GetString(decodedUserId);
                 var user = await _userManager.FindByIdAsync(userId);
@@ -363,11 +332,6 @@ namespace FullAuth.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 var user = await _userManager.FindByNameAsync(resendVerificationEmailDto.UserName);
 
                 if (user == null)
@@ -395,11 +359,6 @@ namespace FullAuth.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 var user = await _userManager.FindByEmailAsync(sendPasswordResetEmailDto.Email);
 
                 if (user == null)
@@ -423,11 +382,6 @@ namespace FullAuth.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 byte[] decodedUserId = WebEncoders.Base64UrlDecode(passwordResetDto.EncodedUserId);
                 string userId = Encoding.UTF8.GetString(decodedUserId);
                 var user = await _userManager.FindByIdAsync(userId);

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,6 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
@@ -98,6 +98,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
+    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver(); 
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
 
