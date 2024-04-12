@@ -9,7 +9,7 @@ namespace FullAuth.Dtos.User
     public class PasswordChangeDto
     {
         [Required]
-        public string UserName { get; set; } = string.Empty;
+        public string UserId { get; set; } = string.Empty;
         [Required]
         public string OldPassword { get; set; } = string.Empty;
         [Required]

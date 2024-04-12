@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace FullAuth.Dtos.User
 {
-    public class ResendVerificationEmailDto
+    public class LogIn2faDto
     {
+        [Required]
+        public string Code { get; set; } = string.Empty;
         [Required]
         public string UserId { get; set; } = string.Empty;
     }
