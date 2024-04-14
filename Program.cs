@@ -1,7 +1,7 @@
 using FullAuth.Data;
+using FullAuth.Dtos.Email;
 using FullAuth.Interfaces;
 using FullAuth.Models;
-using FullAuth.Models.Settings;
 using FullAuth.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -27,6 +27,11 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowAnyMethod();
         });
+});
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options => 
+{
+    options.TokenLifespan = TimeSpan.FromMinutes(10);
 });
 
 builder.Services.AddSwaggerGen(option =>

@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace FullAuth.Dtos.User
 {
-    public class NewUserDto
+    public class SendPasswordResetEmailRequest
     {
-        [Required]
-        public string UserName { get; set; } = string.Empty;
         [Required]
         [EmailAddress]
         public string Email { get; set; } = string.Empty;

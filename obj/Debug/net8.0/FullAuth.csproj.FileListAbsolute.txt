@@ -126,3 +126,10 @@
 /home/nikodem/Programing/NETcore/FullAuth/bin/Debug/net8.0/BouncyCastle.Cryptography.dll
 /home/nikodem/Programing/NETcore/FullAuth/bin/Debug/net8.0/MailKit.dll
 /home/nikodem/Programing/NETcore/FullAuth/bin/Debug/net8.0/MimeKit.dll
+/home/nikodem/Programing/NETcore/FullAuth/bin/Debug/net8.0/FullAuth.staticwebassets.runtime.json
+/home/nikodem/Programing/NETcore/FullAuth/bin/Debug/net8.0/Microsoft.AspNetCore.Identity.UI.dll
+/home/nikodem/Programing/NETcore/FullAuth/bin/Debug/net8.0/Microsoft.Extensions.FileProviders.Embedded.dll
+/home/nikodem/Programing/NETcore/FullAuth/bin/Debug/net8.0/Microsoft.AspNetCore.DataProtection.dll
+/home/nikodem/Programing/NETcore/FullAuth/bin/Debug/net8.0/Microsoft.AspNetCore.DataProtection.Abstractions.dll
+/home/nikodem/Programing/NETcore/FullAuth/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+/home/nikodem/Programing/NETcore/FullAuth/bin/Debug/net8.0/Microsoft.Extensions.Logging.Abstractions.dll

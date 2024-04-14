@@ -30,11 +30,11 @@ namespace FullAuth.Controllers
         }
 
         [HttpPost("signup")]
-        public async Task<IActionResult> Signup([FromBody] SignUpDto signUpDto)
+        public async Task<IActionResult> Signup([FromBody] SignUpRequest signUpRequest)
         {
             try
             {
-                if (await _userManager.FindByNameAsync(signUpDto.UserName) != null)
+                if (await _userManager.FindByNameAsync(signUpRequest.UserName) != null)
                 {
                     var errorList = new
                     {
@@ -46,7 +46,7 @@ namespace FullAuth.Controllers
                     return BadRequest(errorList);
                 }
 
-                if (await _userManager.FindByEmailAsync(signUpDto.Email) != null)
+                if (await _userManager.FindByEmailAsync(signUpRequest.Email) != null)
                 {
                     var errorList = new
                     {
@@ -60,11 +60,11 @@ namespace FullAuth.Controllers
 
                 var appUser = new User
                 {
-                    UserName = signUpDto.UserName,
-                    Email = signUpDto.Email
+                    UserName = signUpRequest.UserName,
+                    Email = signUpRequest.Email
                 };
 
-                var createdUser = await _userManager.CreateAsync(appUser, signUpDto.Password);
+                var createdUser = await _userManager.CreateAsync(appUser, signUpRequest.Password);
                 if (!createdUser.Succeeded)
                 {
                     return StatusCode(500);
@@ -76,7 +76,7 @@ namespace FullAuth.Controllers
                     return StatusCode(500);
                 }
 
-                var user = await _userManager.FindByNameAsync(signUpDto.UserName);
+                var user = await _userManager.FindByNameAsync(signUpRequest.UserName);
 
                 if (user == null)
                 {
@@ -85,11 +85,7 @@ namespace FullAuth.Controllers
 
                 await SendVerification(user);
 
-                return Ok(new NewUserDto
-                {
-                    UserName = appUser.UserName,
-                    Email = appUser.Email
-                });
+                return Ok("User created successfully!");
 
             }
             catch (Exception e)
@@ -99,25 +95,30 @@ namespace FullAuth.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LogInDto logInDto)
+        public async Task<IActionResult> Login([FromBody] LogInRequest logInRequest)
         {
             try
             {
-                var user = await _userManager.FindByNameAsync(logInDto.UserNameOrEmail) ?? await _userManager.FindByEmailAsync(logInDto.UserNameOrEmail);
+                var user = await _userManager.FindByNameAsync(logInRequest.UserNameOrEmail) ?? await _userManager.FindByEmailAsync(logInRequest.UserNameOrEmail);
 
                 if (user == null)
                 {
                     return BadRequest("Invalid credentials!");
                 }
-                
-                if (!await _userManager.CheckPasswordAsync(user, logInDto.Password))
+
+                if (!await _userManager.CheckPasswordAsync(user, logInRequest.Password))
                 {
                     return BadRequest("Invalid credentials!");
                 }
-                
+
                 await Send2fa(user);
 
-                return Ok("Email with authenticaion code sent successfully!");
+                var loginToken = _userManager.GenerateUserTokenAsync(user, TokenOptions.DefaultProvider, "loginToken");
+
+                return Ok(new TwoFactorAuthTokenDto
+                {
+                    LoginToken = loginToken.Result
+                });
             }
             catch (Exception e)
             {
@@ -126,18 +127,23 @@ namespace FullAuth.Controllers
         }
 
         [HttpPost("login-2fa")]
-        public async Task<IActionResult> Login2fa([FromBody] LogIn2faDto logIn2FaDto)
+        public async Task<IActionResult> Login2fa([FromBody] LogIn2FaRequest logIn2FaRequest)
         {
             try
             {
-                var user = await _userManager.FindByIdAsync(logIn2FaDto.UserId);
+                var user = await _userManager.FindByIdAsync(logIn2FaRequest.UserId);
 
                 if (user == null)
                 {
                     return BadRequest("Invalid user!");
                 }
 
-                if (!await _userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultEmailProvider, logIn2FaDto.Code))
+                if (!await _userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultEmailProvider, logIn2FaRequest.Code))
+                {
+                    return BadRequest("Invalid verification code!");
+                }
+
+                if (!await _userManager.VerifyUserTokenAsync(user, TokenOptions.DefaultProvider, "loginToken", logIn2FaRequest.LoginToken))
                 {
                     return BadRequest("Invalid token!");
                 }
@@ -149,7 +155,7 @@ namespace FullAuth.Controllers
 
                 await _userManager.UpdateAsync(user);
 
-                return Ok(new TokensDto
+                return Ok(new TokensResponse
                 {
                     RefreshToken = refreshToken,
                     AccessToken = accessToken
@@ -163,17 +169,17 @@ namespace FullAuth.Controllers
 
         [Authorize]
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto refreshTokenDto)
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
         {
             try
             {
-                var user = await _userManager.FindByIdAsync(refreshTokenDto.UserId);
+                var user = await _userManager.FindByIdAsync(refreshTokenRequest.UserId);
                 if (user == null)
                 {
                     return BadRequest("User doesn't exist!");
                 }
 
-                if (!(refreshTokenDto.RefreshToken == user.RefreshToken))
+                if (!(refreshTokenRequest.RefreshToken == user.RefreshToken))
                 {
                     return BadRequest("Invalid refresh token!");
                 }
@@ -190,7 +196,7 @@ namespace FullAuth.Controllers
 
                 await _userManager.UpdateAsync(user);
 
-                return Ok(new TokensDto
+                return Ok(new TokensResponse
                 {
                     RefreshToken = refreshToken,
                     AccessToken = accessToken
@@ -204,11 +210,11 @@ namespace FullAuth.Controllers
 
         [Authorize]
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout([FromBody] LogOutDto logOutDto)
+        public async Task<IActionResult> Logout([FromBody] LogOutRequest logOutRequest)
         {
             try
             {
-                var user = await _userManager.FindByIdAsync(logOutDto.UserId);
+                var user = await _userManager.FindByIdAsync(logOutRequest.UserId);
 
                 if (user == null)
                 {
@@ -229,18 +235,18 @@ namespace FullAuth.Controllers
 
         [Authorize]
         [HttpDelete("delete")]
-        public async Task<IActionResult> Delete([FromBody] DeleteUserDto deleteUserDto)
+        public async Task<IActionResult> Delete([FromBody] DeleteUserRequest deleteUserRequest)
         {
             try
             {
-                var user = await _userManager.FindByIdAsync(deleteUserDto.UserId);
+                var user = await _userManager.FindByIdAsync(deleteUserRequest.UserId);
 
                 if (user == null)
                 {
                     return BadRequest("User doesn't exist!");
                 }
 
-                if (!await _userManager.CheckPasswordAsync(user, deleteUserDto.Password))
+                if (!await _userManager.CheckPasswordAsync(user, deleteUserRequest.Password))
                 {
                     return BadRequest("Wrong password!");
                 }
@@ -256,11 +262,11 @@ namespace FullAuth.Controllers
 
         [Authorize]
         [HttpPost("username-change")]
-        public async Task<IActionResult> UsernameChange([FromBody] UsernameChangeDto usernameChangeDto)
+        public async Task<IActionResult> UsernameChange([FromBody] UsernameChangeRequest usernameChangeRequest)
         {
             try
             {
-                if (await _userManager.FindByNameAsync(usernameChangeDto.NewUserName) != null)
+                if (await _userManager.FindByNameAsync(usernameChangeRequest.NewUserName) != null)
                 {
                     var errorList = new
                     {
@@ -272,14 +278,14 @@ namespace FullAuth.Controllers
                     return BadRequest(errorList);
                 }
 
-                var user = await _userManager.FindByIdAsync(usernameChangeDto.UserId);
+                var user = await _userManager.FindByIdAsync(usernameChangeRequest.UserId);
 
                 if (user == null)
                 {
                     return BadRequest("User doesn't exist!");
                 }
 
-                user.UserName = usernameChangeDto.NewUserName;
+                user.UserName = usernameChangeRequest.NewUserName;
 
                 await _userManager.UpdateAsync(user);
                 return Ok("Username changed successfully!");
@@ -292,24 +298,25 @@ namespace FullAuth.Controllers
 
         [Authorize]
         [HttpPost("password-change")]
-        public async Task<IActionResult> PasswordChange([FromBody] PasswordChangeDto passwordChangeDto)
+        public async Task<IActionResult> PasswordChange([FromBody] PasswordChangeRequest passwordChangeRequest)
         {
             try
             {
-                var user = await _userManager.FindByIdAsync(passwordChangeDto.UserId);
+                var user = await _userManager.FindByIdAsync(passwordChangeRequest.UserId);
 
                 if (user == null)
                 {
                     return BadRequest("User doesn't exist!");
                 }
 
-                if (!await _userManager.CheckPasswordAsync(user, passwordChangeDto.OldPassword))
+                if (!await _userManager.CheckPasswordAsync(user, passwordChangeRequest.OldPassword))
                 {
                     return BadRequest("Invalid password!");
                 }
 
-                var result = await _userManager.ChangePasswordAsync(user, passwordChangeDto.OldPassword, passwordChangeDto.NewPassword);
-                if (!result.Succeeded) {
+                var result = await _userManager.ChangePasswordAsync(user, passwordChangeRequest.OldPassword, passwordChangeRequest.NewPassword);
+                if (!result.Succeeded)
+                {
                     return BadRequest(result.Errors);
                 }
 
@@ -322,11 +329,11 @@ namespace FullAuth.Controllers
         }
 
         [HttpPost("email-verification")]
-        public async Task<IActionResult> EmailVerification([FromBody] EmailVerificationDto emailVerificationDto)
+        public async Task<IActionResult> EmailVerification([FromBody] EmailVerificationRequest emailVerificationRequest)
         {
             try
             {
-                byte[] decodedUserId = WebEncoders.Base64UrlDecode(emailVerificationDto.EncodedUserId);
+                byte[] decodedUserId = WebEncoders.Base64UrlDecode(emailVerificationRequest.EncodedUserId);
                 string userId = Encoding.UTF8.GetString(decodedUserId);
                 var user = await _userManager.FindByIdAsync(userId);
 
@@ -335,7 +342,7 @@ namespace FullAuth.Controllers
                     return BadRequest("User doesn't exist!");
                 }
 
-                var result = await _userManager.ConfirmEmailAsync(user, emailVerificationDto.VerificationToken);
+                var result = await _userManager.ConfirmEmailAsync(user, emailVerificationRequest.VerificationToken);
 
                 if (!result.Succeeded)
                 {
@@ -352,11 +359,11 @@ namespace FullAuth.Controllers
 
         [Authorize]
         [HttpPost("resend-verification-email")]
-        public async Task<IActionResult> ResendVerificationEmail([FromBody] ResendVerificationEmailDto resendVerificationEmailDto)
+        public async Task<IActionResult> ResendVerificationEmail([FromBody] ResendVerificationEmailRequest resendVerificationEmailRequest)
         {
             try
             {
-                var user = await _userManager.FindByIdAsync(resendVerificationEmailDto.UserId);
+                var user = await _userManager.FindByIdAsync(resendVerificationEmailRequest.UserId);
 
                 if (user == null)
                 {
@@ -379,11 +386,11 @@ namespace FullAuth.Controllers
         }
 
         [HttpPost("send-password-reset-email")]
-        public async Task<IActionResult> SendPasswordResetEmail([FromBody] SendPasswordResetEmailDto sendPasswordResetEmailDto)
+        public async Task<IActionResult> SendPasswordResetEmail([FromBody] SendPasswordResetEmailRequest sendPasswordResetEmailRequest)
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(sendPasswordResetEmailDto.Email);
+                var user = await _userManager.FindByEmailAsync(sendPasswordResetEmailRequest.Email);
 
                 if (user == null)
                 {
@@ -402,11 +409,11 @@ namespace FullAuth.Controllers
         }
 
         [HttpPost("password-reset")]
-        public async Task<IActionResult> PasswordReset([FromBody] PasswordResetDto passwordResetDto)
+        public async Task<IActionResult> PasswordReset([FromBody] PasswordResetRequest passwordResetRequest)
         {
             try
             {
-                byte[] decodedUserId = WebEncoders.Base64UrlDecode(passwordResetDto.EncodedUserId);
+                byte[] decodedUserId = WebEncoders.Base64UrlDecode(passwordResetRequest.EncodedUserId);
                 string userId = Encoding.UTF8.GetString(decodedUserId);
                 var user = await _userManager.FindByIdAsync(userId);
 
@@ -415,7 +422,7 @@ namespace FullAuth.Controllers
                     return BadRequest("User doesn't exist!");
                 }
 
-                var result = await _userManager.ResetPasswordAsync(user, passwordResetDto.ResetToken, passwordResetDto.NewPassword);
+                var result = await _userManager.ResetPasswordAsync(user, passwordResetRequest.ResetToken, passwordResetRequest.NewPassword);
 
                 if (!result.Succeeded)
                 {
@@ -441,7 +448,7 @@ namespace FullAuth.Controllers
             {
                 EmailTo = user.Email!,
                 Subject = "Verify your email!",
-                TemplateName = "email-verification-email.html",
+                TemplateName = "email-verification.html",
                 TemplateData = new Dictionary<string, string>
                 {
                     {"{{ username }}", user.UserName! },
@@ -463,7 +470,7 @@ namespace FullAuth.Controllers
             {
                 EmailTo = user.Email!,
                 Subject = "Reset your password!",
-                TemplateName = "password-reset-email.html",
+                TemplateName = "password-reset.html",
                 TemplateData = new Dictionary<string, string>
                 {
                     {"{{ username }}", user.UserName! },
@@ -481,8 +488,8 @@ namespace FullAuth.Controllers
             var emailData = new EmailDataDto
             {
                 EmailTo = user.Email!,
-                Subject = "Reset your password!",
-                TemplateName = "login-2fa-email.html",
+                Subject = "Your two factor authentication code!",
+                TemplateName = "two-factor-authentication-code.html",
                 TemplateData = new Dictionary<string, string>
                 {
                     {"{{ username }}", user.UserName! },

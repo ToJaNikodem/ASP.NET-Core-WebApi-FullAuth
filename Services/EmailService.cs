@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FullAuth.Dtos.Email;
 using FullAuth.Interfaces;
-using FullAuth.Models.Settings;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -29,7 +28,7 @@ namespace FullAuth.Services
             var builder = new BodyBuilder();
             if (emailDataDto.TemplateName != null)
             {
-                var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", emailDataDto.TemplateName);
+                var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates/Emails", emailDataDto.TemplateName);
                 using (StreamReader reader = File.OpenText(templatePath))
                 {
                     builder.HtmlBody = await reader.ReadToEndAsync();

@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace FullAuth.Dtos.User
 {
-    public class SendPasswordResetEmailDto
+    public class EmailVerificationRequest
     {
         [Required]
-        [EmailAddress]
-        public string Email { get; set; } = string.Empty;
+        public string EncodedUserId { get; set; } = string.Empty;
+        [Required]
+        public string VerificationToken { get; set; } = string.Empty;
     }
 }

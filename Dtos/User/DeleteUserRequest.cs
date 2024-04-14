@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace FullAuth.Dtos.User
 {
-    public class DeleteUserDto
+    public class DeleteUserRequest
     {
         [Required]
         public string UserId { get; set; } = string.Empty;
         [Required]
+        [StringLength(64, MinimumLength = 10, ErrorMessage = "Password must be between 10 and 64 characters long!")]
         public string Password { get; set; } = string.Empty;
     }
 }

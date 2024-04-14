@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FullAuth.Dtos.User
 {
-    public class LogOutDto
+    public class ResendVerificationEmailRequest
     {
         [Required]
         public string UserId { get; set; } = string.Empty;
