@@ -12,8 +12,8 @@ namespace FullAuth.Services
 {
     public class EmailService : IEmailService
     {
-        private readonly EmailSettings _emailSettings;
-        public EmailService(IOptions<EmailSettings> emailSettings)
+        private readonly EmailSettingsDto _emailSettings;
+        public EmailService(IOptions<EmailSettingsDto> emailSettings)
         {
             _emailSettings = emailSettings.Value;
         }

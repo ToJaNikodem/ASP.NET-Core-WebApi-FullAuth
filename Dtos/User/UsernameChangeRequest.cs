@@ -9,6 +9,7 @@ namespace FullAuth.Dtos.User
     public class UsernameChangeRequest
     {
         [Required]
+        [MaxLength(36)]
         public string UserId { get; set; } = string.Empty;
         [Required]
         [RegularExpression(@"^[a-z0-9](?:[a-z0-9]+[.\-_]?)+[a-z0-9]$", ErrorMessage = "Invalid username format!")]

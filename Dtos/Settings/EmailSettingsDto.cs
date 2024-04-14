@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FullAuth.Dtos.Email
 {
-    public class EmailSettings
+    public class EmailSettingsDto
     {
         [Required]
         public string SmtpServer { get; set; } = string.Empty;

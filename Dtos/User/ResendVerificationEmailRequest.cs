@@ -9,6 +9,7 @@ namespace FullAuth.Dtos.User
     public class ResendVerificationEmailRequest
     {
         [Required]
+        [MaxLength(36)]
         public string UserId { get; set; } = string.Empty;
     }
 }

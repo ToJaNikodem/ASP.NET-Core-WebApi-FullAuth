@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FullAuth.Dtos.User
 {
-    public class TwoFactorAuthTokenDto
+    public class TwoFactorAuthTokenResponse
     {
         [Required]
         public string LoginToken { get; set; } = string.Empty;

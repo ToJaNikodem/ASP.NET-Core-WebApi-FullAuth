@@ -9,6 +9,7 @@ namespace FullAuth.Dtos.User
     public class LogOutRequest
     {
         [Required]
+        [MaxLength(36)]
         public string UserId { get; set; } = string.Empty;
     }
 }

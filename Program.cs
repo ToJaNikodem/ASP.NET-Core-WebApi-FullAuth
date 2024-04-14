@@ -13,7 +13,7 @@ using Newtonsoft.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("local-appsettings.json", optional: true, reloadOnChange: true);
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<EmailSettingsDto>(builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

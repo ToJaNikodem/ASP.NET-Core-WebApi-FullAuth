@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using FullAuth.Dtos.Email;
 using FullAuth.Dtos.User;
 using FullAuth.Models;
-using Microsoft.AspNetCore.Identity;
 using FullAuth.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
-using FullAuth.Dtos.Email;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
 using System.Web;
@@ -115,7 +115,7 @@ namespace FullAuth.Controllers
 
                 var loginToken = _userManager.GenerateUserTokenAsync(user, TokenOptions.DefaultProvider, "loginToken");
 
-                return Ok(new TwoFactorAuthTokenDto
+                return Ok(new TwoFactorAuthTokenResponse
                 {
                     LoginToken = loginToken.Result
                 });
