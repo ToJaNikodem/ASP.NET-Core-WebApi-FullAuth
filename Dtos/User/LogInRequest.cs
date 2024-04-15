@@ -9,6 +9,7 @@ namespace FullAuth.Dtos.User
     public class LogInRequest
     {
         [Required]
+        [MaxLength(256)]
         public string UserNameOrEmail { get; set; } = string.Empty;
         [Required]
         [StringLength(64, MinimumLength = 10, ErrorMessage = "Password must be between 10 and 64 characters long!")]

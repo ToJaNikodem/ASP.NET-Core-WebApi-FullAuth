@@ -9,8 +9,10 @@ namespace FullAuth.Dtos.User
     public class EmailVerificationRequest
     {
         [Required]
+        [MaxLength(64)]
         public string EncodedUserId { get; set; } = string.Empty;
         [Required]
+        [MaxLength(300)]
         public string VerificationToken { get; set; } = string.Empty;
     }
 }

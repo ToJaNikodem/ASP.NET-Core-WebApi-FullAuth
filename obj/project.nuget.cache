@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "HoQKYtopPlVh/uXVu8B3vH0lT7AxJbI/rJePLC5MWcbOE3MjQ0n8sLFwi7tUUpIoPLL8kNMIGGv/m9XArBflWQ==",
+  "dgSpecHash": "JZGQq2aLll0fgvA7TxM8D9/v3k0zlUrapdXnq+6RTlVjvcXfwuVNz+e/74JwNb7PYFiGie2BblrhFLLNxh/X1w==",
   "success": true,
-  "projectFilePath": "/home/nikodem/Programing/NET-Core/NET-Core-FullAuth/FullAuth.csproj",
+  "projectFilePath": "/home/nikodem/Programing/NETcore/FullAuth/FullAuth.csproj",
   "expectedPackageFiles": [
     "/home/nikodem/.nuget/packages/bouncycastle.cryptography/2.3.0/bouncycastle.cryptography.2.3.0.nupkg.sha512",
     "/home/nikodem/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",

@@ -12,7 +12,7 @@ namespace FullAuth.Dtos.User
         [MaxLength(64)]
         public string EncodedUserId { get; set; } = string.Empty;
         [Required]
-        [MaxLength(100)]
+        [MaxLength(300)]
         public string ResetToken { get; set; } = string.Empty;
         [Required]
         [StringLength(64, MinimumLength = 10, ErrorMessage = "Password must be between 10 and 64 characters long!")]
