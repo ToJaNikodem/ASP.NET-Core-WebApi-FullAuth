@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/nikodem/Programing/NETcore/FullAuth/FullAuth.csproj": {}
+    "/home/nikodem/Programing/NET-Core/NET-Core-FullAuth/FullAuth.csproj": {}
   },
   "projects": {
-    "/home/nikodem/Programing/NETcore/FullAuth/FullAuth.csproj": {
+    "/home/nikodem/Programing/NET-Core/NET-Core-FullAuth/FullAuth.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/nikodem/Programing/NETcore/FullAuth/FullAuth.csproj",
+        "projectUniqueName": "/home/nikodem/Programing/NET-Core/NET-Core-FullAuth/FullAuth.csproj",
         "projectName": "FullAuth",
-        "projectPath": "/home/nikodem/Programing/NETcore/FullAuth/FullAuth.csproj",
+        "projectPath": "/home/nikodem/Programing/NET-Core/NET-Core-FullAuth/FullAuth.csproj",
         "packagesPath": "/home/nikodem/.nuget/packages/",
-        "outputPath": "/home/nikodem/Programing/NETcore/FullAuth/obj/",
+        "outputPath": "/home/nikodem/Programing/NET-Core/NET-Core-FullAuth/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/nikodem/.nuget/NuGet/NuGet.Config"

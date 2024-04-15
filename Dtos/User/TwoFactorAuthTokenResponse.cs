@@ -10,5 +10,7 @@ namespace FullAuth.Dtos.User
     {
         [Required]
         public string LoginToken { get; set; } = string.Empty;
+        [Required]
+        public string UserId { get; set; } = string.Empty;     
     }
 }

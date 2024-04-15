@@ -114,10 +114,12 @@ namespace FullAuth.Controllers
                 await Send2fa(user);
 
                 var loginToken = _userManager.GenerateUserTokenAsync(user, TokenOptions.DefaultProvider, "loginToken");
+                var encodedToken = HttpUtility.UrlEncode(loginToken.Result);
 
                 return Ok(new TwoFactorAuthTokenResponse
                 {
-                    LoginToken = loginToken.Result
+                    LoginToken = encodedToken,
+                    UserId = user.Id
                 });
             }
             catch (Exception e)
